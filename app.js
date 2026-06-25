@@ -8,6 +8,7 @@ let currentQuestion = null;
 let currentMode = 'sentence'; // 'sentence' | 'word' | 'mistake' | 'analytics'
 let wordDirection = 'en-tr'; // 'en-tr' | 'tr-en'
 let currentHintStep = 0; // Tracks hint clicks for current word
+let isLocalStorageMode = false; // Runs completely client-side if SQLite backend is offline
 
 // State synced with backend database
 let state = {
@@ -152,6 +153,53 @@ function setupEventListeners() {
 
 // Load state from SQLite veritabanı
 async function loadState() {
+  if (isLocalStorageMode) {
+    try {
+      const localStateStr = localStorage.getItem('yds_study_state');
+      if (localStateStr) {
+        const dbState = JSON.parse(localStateStr);
+        state.stats = dbState.stats || state.stats;
+        state.dailyGoal = dbState.dailyGoal || state.dailyGoal;
+        state.dailyProgress = dbState.dailyProgress || state.dailyProgress;
+      }
+      
+      // posStats kontrolü ve varsayılan atama
+      if (!state.stats.posStats) {
+        state.stats.posStats = {
+          verb: { correct: 0, total: 0 },
+          noun: { correct: 0, total: 0 },
+          adjective: { correct: 0, total: 0 },
+          adverb: { correct: 0, total: 0 },
+          conjunction: { correct: 0, total: 0 },
+          preposition: { correct: 0, total: 0 }
+        };
+      }
+      
+      const localWordDetailsStr = localStorage.getItem('yds_word_details');
+      const localWordDetails = localWordDetailsStr ? JSON.parse(localWordDetailsStr) : {};
+      
+      wordPool.forEach(w => {
+        const details = localWordDetails[w.id] || {};
+        w.weight = details.weight !== undefined ? details.weight : 1.0;
+        w.is_mistake = details.is_mistake !== undefined ? details.is_mistake : 0;
+        w.ask_more = details.ask_more !== undefined ? details.ask_more : 0;
+        w.correct_count = details.correct_count !== undefined ? details.correct_count : 0;
+      });
+      
+      state.mistakeIds = wordPool.filter(w => w.is_mistake === 1).map(w => w.id);
+      state.askMoreIds = wordPool.filter(w => w.ask_more === 1).map(w => w.id);
+      wordPool.forEach(w => {
+        state.wordWeights[w.id] = w.weight;
+      });
+    } catch (err) {
+      console.error("LocalStorage state yüklenemedi:", err);
+    }
+    checkDailyReset();
+    updateStatsUI();
+    updateDailyGoalUI();
+    return;
+  }
+
   try {
     const response = await fetch('/api/state');
     if (response.ok) {
@@ -194,6 +242,19 @@ async function loadState() {
 
 // State'i veritabanına kaydet (Optimistic asenkron post)
 async function saveState() {
+  if (isLocalStorageMode) {
+    try {
+      localStorage.setItem('yds_study_state', JSON.stringify({
+        stats: state.stats,
+        dailyGoal: state.dailyGoal,
+        dailyProgress: state.dailyProgress
+      }));
+    } catch (err) {
+      console.error("State LocalStorage'a kaydedilemedi:", err);
+    }
+    return;
+  }
+
   try {
     await fetch('/api/state', {
       method: 'POST',
@@ -213,6 +274,27 @@ async function saveState() {
 
 // Kelime Ağırlığını, Hata durumunu, Sık Sor durumunu ve Doğru Bilinme Sayısını veritabanına kaydet (Asenkron post)
 async function saveWordWeightToDb(wordId, weight, isMistake, askMore, correctCount) {
+  if (isLocalStorageMode) {
+    try {
+      const localWordDetailsStr = localStorage.getItem('yds_word_details');
+      const localWordDetails = localWordDetailsStr ? JSON.parse(localWordDetailsStr) : {};
+      
+      if (!localWordDetails[wordId]) {
+        localWordDetails[wordId] = {};
+      }
+      
+      if (weight !== undefined) localWordDetails[wordId].weight = weight;
+      if (isMistake !== undefined) localWordDetails[wordId].is_mistake = isMistake;
+      if (askMore !== undefined) localWordDetails[wordId].ask_more = askMore;
+      if (correctCount !== undefined) localWordDetails[wordId].correct_count = correctCount;
+      
+      localStorage.setItem('yds_word_details', JSON.stringify(localWordDetails));
+    } catch (err) {
+      console.warn(`Kelime ${wordId} LocalStorage'a kaydedilemedi:`, err);
+    }
+    return;
+  }
+
   try {
     const payload = {
       weight: weight,
@@ -329,8 +411,35 @@ async function fetchWordPool() {
       loadNextQuestion();
     }, 600);
   } catch (error) {
-    console.error('Veri yüklenirken hata oluştu:', error);
-    loaderEl.innerHTML = `<p style="color: var(--color-danger); text-align:center; padding:20px;">SQLite API sunucusuna bağlanılamadı! Lütfen "app_server.py" sunucusunun çalıştığından emin olun.</p>`;
+    console.warn('Backend API connection failed, trying client-side fallback:', error);
+    try {
+      // Fallback to static JSON file in client-side / LocalStorage mode
+      const response = await fetch('/ydskelimehavuzu.json');
+      if (!response.ok) {
+        throw new Error(`Static File HTTP Error: ${response.status}`);
+      }
+      const data = await response.json();
+      wordPool = data.words || [];
+      isLocalStorageMode = true;
+      console.log('Client-side LocalStorage mode initialized successfully with static JSON.');
+
+      // Set total word count badge
+      if (totalWordsBadgeEl) {
+        totalWordsBadgeEl.textContent = wordPool.length;
+      }
+      
+      // Hide loader
+      setTimeout(() => {
+        loaderEl.style.opacity = '0';
+        setTimeout(() => loaderEl.style.display = 'none', 400);
+        
+        // Load first question
+        loadNextQuestion();
+      }, 600);
+    } catch (fallbackError) {
+      console.error('All data loading attempts failed:', fallbackError);
+      loaderEl.innerHTML = `<p style="color: var(--color-danger); text-align:center; padding:20px;">SQLite API veya statik JSON dosyasına bağlanılamadı! Lütfen "app_server.py" sunucusunun çalıştığından veya "ydskelimehavuzu.json" dosyasının mevcut olduğundan emin olun.</p>`;
+    }
   }
 }
 
