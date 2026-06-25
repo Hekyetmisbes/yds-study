@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YDS Kelime Havuzu - Boşluk Doldurma Pratiği</title>
+  <!-- Modern Google Font: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Yükleme Ekranı (Loading Shimmer) -->
+  <div id="loader" class="loader-overlay">
+    <div class="spinner"></div>
+    <p>Kelime Havuzu Yükleniyor...</p>
+  </div>
+
+  <div class="app-container">
+    <!-- Üst Bar: Skor, İlerleme ve İstatistikler -->
+    <header class="app-header">
+      <div class="logo">
+        <span class="logo-badge">YDS</span>
+        <h1>WordMaster</h1>
+      </div>
+      <div class="stats-panel">
+        <div class="stat-box">
+          <span class="stat-label">Doğru</span>
+          <span id="correct-count" class="stat-value text-success">0</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box">
+          <span class="stat-label">Yanlış</span>
+          <span id="incorrect-count" class="stat-value text-danger">0</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box">
+          <span class="stat-label">Başarı</span>
+          <span id="accuracy-rate" class="stat-value">0%</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box daily-goal-box">
+          <span class="stat-label">Bugün</span>
+          <div class="goal-progress-wrapper" title="Günlük hedefini değiştirmek için tıkla" id="goal-wrapper">
+            <svg class="progress-ring" width="28" height="28">
+              <circle class="progress-ring__circle-bg" stroke="#e2e8f0" stroke-width="2.5" fill="transparent" r="11" cx="14" cy="14"/>
+              <circle id="goal-progress-circle" class="progress-ring__circle" stroke="var(--color-brand)" stroke-width="2.5" fill="transparent" r="11" cx="14" cy="14"/>
+            </svg>
+            <span id="goal-text" class="goal-progress-text">0/30</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mod Seçici (Segmented Control) -->
+    <nav class="mode-selector-wrapper">
+      <div class="mode-selector">
+        <button id="mode-sentence" class="mode-btn active">Cümle Pratiği</button>
+        <button id="mode-word" class="mode-btn">Kelime Öğrenme</button>
+        <button id="mode-mistake" class="mode-btn">Hata Defteri</button>
+        <button id="mode-analytics" class="mode-btn">Analiz Paneli</button>
+      </div>
+    </nav>
+
+    <!-- Ana Çalışma Alanı / Kart Yapısı -->
+    <main class="main-content">
+      <div class="quiz-card" id="quiz-card">
+        
+        <!-- Soru Bilgileri, Yön Seçici ve Araçlar -->
+        <div class="card-meta">
+          <div class="tag-group">
+            <span id="word-pos" class="badge-tag">pos</span>
+            <span id="word-level" class="badge-tag level-tag">level</span>
+          </div>
+
+          <!-- Yön Seçici (Sadece Kelime Modunda Görünür) -->
+          <div id="direction-selector-container" class="direction-selector hidden">
+            <button id="dir-en-tr" class="dir-btn active">EN ➔ TR</button>
+            <button id="dir-tr-en" class="dir-btn">TR ➔ EN</button>
+          </div>
+
+          <div class="card-actions">
+            <button id="ask-frequently-btn" class="btn-icon" title="Daha Sık Sor" aria-label="Daha Sık Sor">
+              <!-- SVG Star Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </button>
+            <button id="hint-button" class="btn-icon" title="İpucu Al" aria-label="İpucu Al">
+              <!-- SVG Lightbulb Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1 .3 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line></svg>
+            </button>
+            <button id="tts-button" class="btn-icon" title="Telaffuzu Dinle" aria-label="Telaffuzu Dinle">
+              <!-- SVG Audio Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Cümle Boşluk Doldurma Soru Alanı -->
+        <div id="sentence-container" class="sentence-container">
+          <p id="sentence-text" class="sentence-display">
+            <!-- Cümle buraya dinamik eklenecek -->
+          </p>
+        </div>
+
+        <!-- Kelime Öğrenme Soru Alanı (Büyük Kelime / Anlam) -->
+        <div id="word-container" class="word-question-container hidden">
+          <h2 id="word-question-text" class="word-question-display">word</h2>
+        </div>
+
+        <!-- İpucu Kutusu (Gelişmiş İpucu Sistemi) -->
+        <div id="hint-box" class="hint-box hidden">
+          <div class="hint-content">
+            <span class="hint-bulb">💡</span>
+            <p id="hint-text">İpucu metni buraya gelecek.</p>
+          </div>
+        </div>
+
+        <!-- Seçenekler Alanı (4 Adet Seçenek Butonu) -->
+        <div class="options-grid" id="options-container">
+          <!-- Butonlar JavaScript ile dinamik olarak yerleştirilecek -->
+        </div>
+
+      </div>
+
+      <!-- Analiz Paneli Konteyneri (İstatistikler) -->
+      <div id="analytics-container" class="analytics-card d-none">
+        <!-- JavaScript ile dinamik olarak doldurulacak -->
+      </div>
+    </main>
+
+    <!-- Minimalist Footer ve Yedekleme Paneli -->
+    <footer class="app-footer">
+      <div class="backup-panel">
+        <button id="btn-export" class="btn-text-link" title="Çalışma geçmişini JSON olarak indir">Yedek İndir</button>
+        <span class="backup-divider">|</span>
+        <button id="btn-import-trigger" class="btn-text-link" title="JSON yedek dosyasını yükle">Yedek Yükle</button>
+        <input type="file" id="import-file" class="hidden-file-input" accept=".json" style="display: none;">
+      </div>
+      <p>Toplam kelime sayısı: <span id="total-words-badge">-</span> | Akademik İngilizce Hazırlık</p>
+    </footer>
+  </div>
+
+  <!-- Yanlış Cevap Açıklama Modali (Pop-up) -->
+  <div id="explanation-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title-wrapper">
+          <div class="warning-icon-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          </div>
+          <h2>Yanlış Cevap</h2>
+        </div>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Doğru Kelime ve Anlamı -->
+        <div class="explain-word-section">
+          <div class="explain-word-header">
+            <span class="explain-label">Doğru Kelime</span>
+            <div class="explain-word-title">
+              <span id="modal-correct-word" class="correct-word-highlight">word</span>
+              <span id="modal-word-pos" class="word-pos-tag">pos</span>
+            </div>
+          </div>
+          <div class="explain-word-meanings">
+            <span class="explain-label">Türkçe Anlamları</span>
+            <p id="modal-word-meanings" class="word-meanings-text">anlam1, anlam2</p>
+          </div>
+        </div>
+
+        <!-- Cümle Çevirileri -->
+        <div class="explain-sentence-section">
+          <div class="explain-sentence-block">
+            <span class="explain-label">Cümlenin Tam Hali</span>
+            <p id="modal-sentence-en" class="sentence-en-text">Orijinal İngilizce cümle.</p>
+          </div>
+          <div class="explain-sentence-block">
+            <span class="explain-label">Türkçe Çevirisi</span>
+            <p id="modal-sentence-tr" class="sentence-tr-text">Türkçe çeviri metni.</p>
+          </div>
+        </div>
+
+        <!-- Neden Doğru Açıklaması -->
+        <div class="explain-reason-section">
+          <span class="explain-label">Analiz ve Açıklama</span>
+          <p id="modal-explanation-text" class="explanation-desc-text">
+            Cümlede boş bırakılan yere gelmesi gereken kelime...
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="modal-close-btn" class="btn-primary">
+          <span>Anladım, Devam Et</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
