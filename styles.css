@@ -332,7 +332,23 @@ body {
 .sentence-container {
   min-height: 90px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.sentence-translation-display {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--color-success);
+  background-color: var(--color-success-bg);
+  border-left: 3.5px solid var(--color-success);
+  padding: 10px 14px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  animation: fadeIn var(--transition-fast) ease-out;
+  margin-top: 8px;
+  text-align: left;
 }
 
 /* Word Mode Question Styles */

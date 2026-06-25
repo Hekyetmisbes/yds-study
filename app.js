@@ -712,6 +712,13 @@ function loadNextQuestion() {
   // Her yeni soruda ipucunu kapat ve sıfırla
   resetHint();
   
+  // Çeviriyi gizle ve temizle
+  const translationEl = document.getElementById('sentence-translation');
+  if (translationEl) {
+    translationEl.classList.add('hidden');
+    translationEl.textContent = '';
+  }
+  
   if (synth && synth.speaking) {
     synth.cancel();
   }
@@ -1081,12 +1088,24 @@ function handleOptionClick(selectedOption, clickedButton) {
     clickedButton.classList.add('correct');
     
     const isSentence = currentMode === 'sentence' || (currentMode === 'mistake' && currentQuestion.mistakeSubMode === 'sentence');
+    let transitionDelay = 900;
+    
     if (isSentence) {
       const blankSpace = document.getElementById('blank-space');
       if (blankSpace) {
         blankSpace.textContent = currentQuestion.wordData.word;
         blankSpace.classList.add('correct');
       }
+      
+      // Türkçe çeviriyi boşluğun altına yerleştir ve göster
+      const translationEl = document.getElementById('sentence-translation');
+      if (translationEl && currentQuestion.example && currentQuestion.example.tr) {
+        translationEl.textContent = currentQuestion.example.tr;
+        translationEl.classList.remove('hidden');
+      }
+      
+      // Cümlenin tamamını okuyabilmesi için geçiş süresini uzatıyoruz (3.5 saniye)
+      transitionDelay = 3500;
     } else {
       wordQuestionTextEl.style.color = 'var(--color-success)';
       setTimeout(() => {
@@ -1100,7 +1119,7 @@ function handleOptionClick(selectedOption, clickedButton) {
     saveState();
     updateStatsUI();
     
-    setTimeout(loadNextQuestion, 900);
+    setTimeout(loadNextQuestion, transitionDelay);
   } else {
     clickedButton.classList.add('incorrect');
     
