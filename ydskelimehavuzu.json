@@ -2363,16 +2363,16 @@
       ],
       "examples": [
         {
-          "en": "The sudden transition to remote work created some arbitrary problems for the staff.",
-          "tr": "Uzaktan çalışmaya ani geçiş, personel için bazı keyfi sorunlar yarattı."
+          "en": "Because the decision was based on personal preference rather than rules, it was criticized as being arbitrary.",
+          "tr": "Karar kurallar yerine kişisel tercihlere dayandığı için keyfi olduğu gerekçesiyle eleştirildi."
         },
         {
-          "en": "The team is seeking a arbitrary solution that can be implemented quickly.",
-          "tr": "Ekip, hızlı bir şekilde uygulanabilecek keyfi bir çözüm arıyor."
+          "en": "The selection of participants for the study was completely arbitrary, without any systematic criteria.",
+          "tr": "Çalışma için katılımcıların seçimi, herhangi bir sistematik kriter olmaksızın tamamen rastgeleydi."
         },
         {
-          "en": "It is important to remember that human rights are arbitrary under international law.",
-          "tr": "İnsan haklarının uluslararası hukuk kapsamında keyfi olduğunu unutmamak önemlidir."
+          "en": "Dictators often make arbitrary rules to maintain control over the population.",
+          "tr": "Diktatörler, nüfus üzerindeki kontrollerini sürdürmek için sık sık keyfi kurallar koyarlar."
         }
       ],
       "level": "B2-C1 / YDS",
@@ -4103,16 +4103,16 @@
       ],
       "examples": [
         {
-          "en": "The sudden transition to remote work created some consistent problems for the staff.",
-          "tr": "Uzaktan çalışmaya ani geçiş, personel için bazı tutarlı sorunlar yarattı."
+          "en": "His actions are not consistent with his words, which makes it hard to trust him.",
+          "tr": "Eylemleri sözleriyle tutarlı değil, bu da ona güvenmeyi zorlaştırıyor."
         },
         {
-          "en": "The team is seeking a consistent solution that can be implemented quickly.",
-          "tr": "Ekip, hızlı bir şekilde uygulanabilecek tutarlı bir çözüm arıyor."
+          "en": "To achieve your language learning goals, you need consistent daily practice.",
+          "tr": "Dil öğrenme hedeflerinize ulaşmak için istikrarlı bir günlük pratiğe ihtiyacınız var."
         },
         {
-          "en": "It is important to remember that human rights are consistent under international law.",
-          "tr": "İnsan haklarının uluslararası hukuk kapsamında tutarlı olduğunu unutmamak önemlidir."
+          "en": "The new test results are consistent with the data gathered in our previous study.",
+          "tr": "Yeni test sonuçları, önceki çalışmamızda toplanan verilerle tutarlıdır."
         }
       ],
       "level": "B2-C1 / YDS",
@@ -6800,16 +6800,16 @@
       ],
       "examples": [
         {
-          "en": "Technological advancements have led to a significant increase in evidence globally.",
-          "tr": "Teknolojik gelişmeler, küresel olarak kanıt miktarında önemli bir artışa yol açtı."
+          "en": "There is no scientific evidence to support the claim that this herbal tea cures cancer.",
+          "tr": "Bu bitki çayının kanseri tedavi ettiği iddiasını destekleyecek hiçbir bilimsel kanıt yoktur."
         },
         {
-          "en": "The international conference focused heavily on the relationship between peace and evidence.",
-          "tr": "Uluslararası konferans, barış ile kanıt arasındaki ilişkiye büyük ölçüde odaklandı."
+          "en": "The police gathered enough evidence to arrest the suspect before he left the country.",
+          "tr": "Polis, şüpheliyi ülkeden ayrılmadan önce tutuklamak için yeterli delil topladı."
         },
         {
-          "en": "The textbook provides a comprehensive overview of the principles of evidence.",
-          "tr": "Ders kitabı, kanıt ilkelerine kapsamlı bir genel bakış sunmaktadır."
+          "en": "Fossil discoveries provide strong evidence that these prehistoric animals lived in herds.",
+          "tr": "Fosil keşifleri, bu tarih öncesi hayvanların sürüler halinde yaşadığına dair güçlü kanıtlar sunmaktadır."
         }
       ],
       "level": "B2-C1 / YDS",
@@ -8250,16 +8250,16 @@
       ],
       "examples": [
         {
-          "en": "To protect public health, the city council decided to indicate a positive trend.",
-          "tr": "Halk sağlığını korumak için belediye meclisi olumlu bir eğilimi göstermeye karar verdi."
+          "en": "A high fever and persistent cough usually indicate an underlying infection.",
+          "tr": "Yüksek ateş ve geçmeyen öksürük genellikle altta yatan bir enfeksiyonu gösterir (işaret eder)."
         },
         {
-          "en": "The university was forced to indicate a positive trend due to the strike.",
-          "tr": "Üniversite, grev nedeniyle olumlu bir eğilimi göstermek zorunda kaldı."
+          "en": "Recent economic indicators indicate that the country is recovering from the recession.",
+          "tr": "Son ekonomik göstergeler, ülkenin durgunluktan çıkmakta olduğunu göstermektedir."
         },
         {
-          "en": "This innovative software is designed to indicate a positive trend automatically.",
-          "tr": "Bu yenilikçi yazılım, olumlu bir eğilimi otomatik olarak göstermek amacıyla tasarlanmıştır."
+          "en": "Please indicate your preferred date of arrival on the registration form.",
+          "tr": "Lütfen kayıt formunda tercih ettiğiniz varış tarihini belirtiniz."
         }
       ],
       "level": "B2-C1 / YDS",
@@ -21372,6 +21372,96 @@
         "polysemy",
         "YDS",
         "same verb different meaning"
+      ]
+    },
+    {
+      "id": 711,
+      "word": "seeks to",
+      "pos": "phrase",
+      "turkish_meanings": [
+        "amaçlamak",
+        "çabalamak",
+        "hedeflemek"
+      ],
+      "examples": [
+        {
+          "en": "The new environmental program seeks to reduce carbon emissions by thirty percent.",
+          "tr": "Yeni çevre programı, karbon emisyonlarını yüzde otuz oranında azaltmayı amaçlamaktadır."
+        },
+        {
+          "en": "Through this research, the scientist seeks to understand the origins of the virus.",
+          "tr": "Bilim insanı bu araştırma yoluyla virüsün kökenlerini anlamaya çalışmaktadır."
+        },
+        {
+          "en": "The government seeks to reform the healthcare system to improve patient care.",
+          "tr": "Hükümet, hasta bakımını iyileştirmek amacıyla sağlık sisteminde reform yapmayı hedeflemektedir."
+        }
+      ],
+      "level": "B2-C1 / YDS",
+      "domain_tags": [
+        "academic English",
+        "YDS",
+        "verb phrases"
+      ]
+    },
+    {
+      "id": 712,
+      "word": "initiative",
+      "pos": "noun",
+      "turkish_meanings": [
+        "girişim",
+        "teşebbüs",
+        "ön ayak olma"
+      ],
+      "examples": [
+        {
+          "en": "The school started a new initiative to encourage students to read more books.",
+          "tr": "Okul, öğrencileri daha fazla kitap okumaya teşvik etmek için yeni bir girişim başlattı."
+        },
+        {
+          "en": "Without government support, this private business initiative is likely to fail.",
+          "tr": "Hükümet desteği olmadan, bu özel iş teşebbüsünün başarısız olması muhtemeldir."
+        },
+        {
+          "en": "The diplomatic initiative was launched to bring peace to the war-torn region.",
+          "tr": "Savaşın parçaladığı bölgeye barış getirmek için diplomatik girişim başlatıldı."
+        }
+      ],
+      "level": "B2-C1 / YDS",
+      "domain_tags": [
+        "academic nouns",
+        "YDS",
+        "reading comprehension"
+      ]
+    },
+    {
+      "id": 713,
+      "word": "discuss",
+      "pos": "verb",
+      "turkish_meanings": [
+        "tartışmak",
+        "görüşmek",
+        "ele almak"
+      ],
+      "examples": [
+        {
+          "en": "The board of directors will meet tomorrow to discuss the budget for next year.",
+          "tr": "Yönetim kurulu, gelecek yılın bütçesini görüşmek üzere yarın toplanacak."
+        },
+        {
+          "en": "It is important to discuss the potential risks before implementing the plan.",
+          "tr": "Planı uygulamadan önce olası riskleri tartışmak önemlidir."
+        },
+        {
+          "en": "In his latest book, the author does not discuss the economic factors of the revolution.",
+          "tr": "Yazar, son kitabında devrimin ekonomik faktörlerini ele almamaktadır (tartışmamaktadır)."
+        }
+      ],
+      "level": "B2-C1 / YDS",
+      "domain_tags": [
+        "academic verbs",
+        "YDS",
+        "sentence completion"
       ]
     }
   ]
