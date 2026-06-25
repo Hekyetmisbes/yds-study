@@ -520,10 +520,12 @@ body {
   transition: opacity var(--transition-normal);
 }
 
+/* Modal Content container layout rules */
 .modal-content {
   background-color: var(--bg-card);
   width: 90%;
   max-width: 520px;
+  max-height: 85vh;
   border-radius: var(--radius-lg);
   box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15);
   border: 1px solid rgba(226, 232, 240, 0.8);
@@ -573,6 +575,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow-y: auto;
+  padding-right: 6px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .explain-label {
