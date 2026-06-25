@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YDS Öğretici Testler - Soru Çözüm Pratiği</title>
+  <!-- Modern Google Font: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Yükleme Ekranı (Loading Shimmer) -->
+  <div id="loader" class="loader-overlay">
+    <div class="spinner"></div>
+    <p>Test Soruları Yükleniyor...</p>
+  </div>
+
+  <div class="app-container">
+    <!-- Üst Bar: Skor, İlerleme ve İstatistikler -->
+    <header class="app-header">
+      <div class="logo">
+        <span class="logo-badge">YDS</span>
+        <h1>WordMaster</h1>
+        <a href="index.html" class="nav-switch-btn">🔍 Kelime Havuzu ➔</a>
+      </div>
+      <div class="stats-panel">
+        <div class="stat-box">
+          <span class="stat-label">Doğru</span>
+          <span id="correct-count" class="stat-value text-success">0</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box">
+          <span class="stat-label">Yanlış</span>
+          <span id="incorrect-count" class="stat-value text-danger">0</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box">
+          <span class="stat-label">Başarı</span>
+          <span id="accuracy-rate" class="stat-value">0%</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-box daily-goal-box">
+          <span class="stat-label">Soru</span>
+          <div class="goal-progress-wrapper" id="goal-wrapper" style="cursor: default;">
+            <!-- Çözülen / Toplam Soru İlerlemesi -->
+            <span id="progress-text" class="goal-progress-text" style="font-size: 0.8rem; font-weight: 700; color: var(--color-brand); transform: none; position: static;">0/0</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Ana Çalışma Alanı / Kart Yapısı -->
+    <main class="main-content">
+      <div class="quiz-card" id="test-card">
+        
+        <!-- Soru Bilgileri ve Meta Bilgileri -->
+        <div class="test-meta-info">
+          <div class="tag-group">
+            <span id="test-section" class="badge-tag">Bölüm</span>
+            <span id="test-type" class="badge-tag">Tür</span>
+            <span id="test-difficulty" class="badge-tag level-tag">Zorluk</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <button id="hint-button" class="btn-icon" title="İpucu Al (Türkçe Çeviri)" aria-label="İpucu Al" style="padding: 6px; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; border: 1px solid #e2e8f0; background: #ffffff; cursor: pointer; transition: all var(--transition-fast);">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px; color: var(--color-text-secondary);"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A5 5 0 0 0 8 8c0 1 .3 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path><line x1="9" y1="18" x2="15" y2="18"></line><line x1="10" y1="22" x2="14" y2="22"></line></svg>
+            </button>
+            <div class="question-number-badge" id="question-number-badge">Soru 1/184</div>
+          </div>
+        </div>
+
+        <!-- Paragraf/Okuma Parçası (Varsa) -->
+        <div id="passage-container" class="passage-box d-none">
+          <div class="passage-title">Reading Passage / Okuma Parçası</div>
+          <p id="passage-text" class="passage-text"></p>
+        </div>
+
+        <!-- Soru Gövdesi -->
+        <div class="sentence-container">
+          <p id="question-text" class="sentence-display" style="font-size: 1.15rem; margin-bottom: 12px;"></p>
+          <p id="question-translation" class="sentence-translation-display d-none" style="font-size: 0.95rem; font-style: italic; color: var(--color-text-secondary);"></p>
+        </div>
+
+        <!-- Seçenekler Stack (Dikey Seçenekler) -->
+        <div class="options-stack" id="options-container" style="margin-top: 24px;">
+          <!-- Seçenekler JS ile doldurulacak -->
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Minimalist Footer -->
+    <footer class="app-footer">
+      <p>Toplam soru sayısı: <span id="total-questions-badge">-</span> | Akademik İngilizce Hazırlık</p>
+    </footer>
+  </div>
+
+  <!-- Detaylı Açıklama Modali -->
+  <div id="explanation-modal" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title-wrapper">
+          <div id="modal-result-icon" class="warning-icon-badge">
+            <!-- Dinamik olarak doğru/yanlış ikonu yerleştirilecek -->
+          </div>
+          <h2 id="modal-result-title">Soru Açıklaması</h2>
+        </div>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Doğru Cevap Bölümü -->
+        <div class="explain-word-section" id="modal-correct-section" style="border-left: 4px solid var(--color-success);">
+          <div class="explain-word-header">
+            <span class="explain-label">Doğru Cevap</span>
+            <div class="explain-word-title" style="margin-top: 4px;">
+              <span id="modal-correct-label" class="correct-word-highlight" style="font-size: 1.2rem; padding: 2px 8px; border-radius: 4px; background-color: var(--color-success-bg); color: var(--color-success);">A</span>
+              <span id="modal-correct-text-en" style="font-weight: 600; font-size: 1.1rem; margin-left: 8px;">correct option text</span>
+            </div>
+            <p id="modal-correct-text-tr" style="font-size: 0.9rem; color: var(--color-text-secondary); margin-top: 4px; font-style: italic;"></p>
+          </div>
+        </div>
+
+        <!-- Açıklama -->
+        <div class="explain-reason-section" style="margin-top: 16px;">
+          <span class="explain-label">Çözüm ve Analiz</span>
+          <p id="modal-explanation-text" class="explanation-desc-text" style="line-height: 1.6; font-size: 0.95rem; margin-top: 6px;">
+            Açıklama metni...
+          </p>
+        </div>
+
+        <!-- Diğer Seçeneklerin Analizi -->
+        <div class="explanation-sub-section" id="modal-distractors-section" style="margin-top: 16px;">
+          <span class="explain-label">Neden Diğerleri Değil?</span>
+          <div id="modal-distractors-list" style="margin-top: 8px;">
+            <!-- Neden diğerleri olmadığına dair listeler buraya eklenecek -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="modal-close-btn" class="btn-primary">
+          <span>Sonraki Soru</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-arrow"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="tests_app.js"></script>
+</body>
+</html>

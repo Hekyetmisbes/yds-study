@@ -1261,8 +1261,32 @@ function toggleHint() {
   
   currentHintStep++;
   
-  let hintText = '';
   const wordData = currentQuestion.wordData;
+  const wordId = wordData.id;
+  
+  // Ceza Uygulaması: İpucu ilk tıklandığında kelimenin ağırlığını artırıp correct_count'unu azalt
+  if (currentHintStep === 1) {
+    // correct_count: 1 azalt (min -10)
+    let correctCount = wordData.correct_count || 0;
+    correctCount = Math.max(-10, correctCount - 1);
+    wordData.correct_count = correctCount;
+    
+    // weight: 0.5 ekle (max 3.0)
+    let currentWeight = state.wordWeights[wordId] !== undefined ? state.wordWeights[wordId] : (wordData.weight || 1.0);
+    let newWeight = Math.min(3.0, currentWeight + 0.5);
+    newWeight = parseFloat(newWeight.toFixed(2));
+    
+    state.wordWeights[wordId] = newWeight;
+    wordData.weight = newWeight;
+    
+    const isMistake = state.mistakeIds.includes(wordId) ? 1 : 0;
+    const askMore = state.askMoreIds.includes(wordId) ? 1 : 0;
+    
+    saveWordWeightToDb(wordId, newWeight, isMistake, askMore, correctCount);
+    console.log(`Hint penalty applied to word ${wordData.word}: weight=${newWeight}, correct_count=${correctCount}`);
+  }
+  
+  let hintText = '';
   const example = currentQuestion.example;
   
   // Modlara göre ipucu tiplerini seç
