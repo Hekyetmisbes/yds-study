@@ -1,4 +1,5 @@
 import os
+import random
 import json
 import sqlite3
 from flask import Flask, jsonify, request, send_from_directory
@@ -369,30 +370,114 @@ def save_user_state():
         return jsonify({'error': 'Veriler kaydedilemedi.'}), 500
 
 
+def get_dynamic_distractors(conn, correct_word, pos_type, count=4):
+    """Belirli bir kelime türünde (pos) doğru kelime hariç rastgele çeldirici kelimeler çeker."""
+    cursor = conn.cursor()
+    # words tablosundaki pos değerlerini normalize edip aratalım
+    rows = cursor.execute('''
+        SELECT word FROM words 
+        WHERE LOWER(pos) = LOWER(?) AND LOWER(word) != LOWER(?)
+        ORDER BY RANDOM() LIMIT ?
+    ''', (pos_type, correct_word, count)).fetchall()
+    
+    distractors = []
+    for r in rows:
+        w_word = r['word']
+        m_rows = cursor.execute('SELECT meaning FROM meanings WHERE word_id = (SELECT id FROM words WHERE word = ?)', (w_word,)).fetchall()
+        meanings = [m['meaning'] for m in m_rows]
+        distractors.append({
+            'text_en': w_word,
+            'text_tr': ', '.join(meanings) if meanings else 'anlam bulunamadı'
+        })
+        
+    # Eğer yeterli sayıda kelime bulunamazsa genel kelimelerden tamamla
+    if len(distractors) < count:
+        needed = count - len(distractors)
+        query = '''
+            SELECT word FROM words 
+            WHERE LOWER(word) != LOWER(?)
+        '''
+        params = [correct_word]
+        if distractors:
+            query += f' AND LOWER(word) NOT IN ({",".join(["?"]*len(distractors))})'
+            params += [d['text_en'].lower() for d in distractors]
+            
+        query += ' ORDER BY RANDOM() LIMIT ?'
+        params.append(needed)
+        
+        fallback_rows = cursor.execute(query, params).fetchall()
+        for r in fallback_rows:
+            w_word = r['word']
+            m_rows = cursor.execute('SELECT meaning FROM meanings WHERE word_id = (SELECT id FROM words WHERE word = ?)', (w_word,)).fetchall()
+            meanings = [m['meaning'] for m in m_rows]
+            distractors.append({
+                'text_en': w_word,
+                'text_tr': ', '.join(meanings) if meanings else 'anlam bulunamadı'
+            })
+            
+    return distractors
+
+
 @app.route('/api/tests', methods=['GET'])
 def get_tests():
-    """Öğretici test soru bankasını veritabanından çekerek döner."""
+    """Öğretici test soru bankasını veritabanından çekerek ve kelime şıklarını dinamik üreterek döner."""
     conn = get_db()
     cursor = conn.cursor()
     try:
         rows = cursor.execute('SELECT * FROM test_questions').fetchall()
-        conn.close()
         
         result = []
         for r in rows:
+            q_id = r['id']
+            section = r['section']
+            correct_word = r['correct_text_en']
+            
+            # Varsayılan orijinal seçenekler
+            options = json.loads(r['options_json'])
+            correct_label = r['correct_label']
+            
+            # EĞER Kelime ve Eşdizim sorusuysa ve doğru kelime mevcutsa
+            if section == 'Kelime ve Eşdizim' and correct_word:
+                # 1. Kelimenin pos'unu bul
+                word_row = cursor.execute('SELECT pos FROM words WHERE LOWER(word) = LOWER(?)', (correct_word,)).fetchone()
+                pos_type = word_row['pos'] if word_row else 'adverb' # varsayılan zarf (adverb)
+                
+                # 2. Dinamik çeldirici kelimeler çek
+                distractors = get_dynamic_distractors(conn, correct_word, pos_type, count=4)
+                
+                # 3. Doğru seçeneği de ekleyip karıştır
+                correct_opt = {
+                    'text_en': correct_word,
+                    'text_tr': r['correct_text_tr']
+                }
+                all_opts = [correct_opt] + distractors
+                random.shuffle(all_opts)
+                
+                # Seçenek etiketlerini (A-E) yeniden yerleştir ve doğru seçeneği bul
+                options = []
+                for idx, opt in enumerate(all_opts):
+                    lbl = chr(65 + idx) # A, B, C, D, E
+                    if opt['text_en'] == correct_word:
+                        correct_label = lbl
+                    options.append({
+                        'label': lbl,
+                        'text_en': opt['text_en'],
+                        'text_tr': opt['text_tr']
+                    })
+            
             result.append({
-                'id': r['id'],
-                'section': r['section'],
+                'id': q_id,
+                'section': section,
                 'question_type': r['question_type'],
                 'difficulty': r['difficulty'],
                 'question_en': r['question_en'],
                 'question_tr': r['question_tr'],
                 'passage_en': r['passage_en'],
                 'passage_tr': r['passage_tr'],
-                'options': json.loads(r['options_json']),
+                'options': options,
                 'answer': {
-                    'label': r['correct_label'],
-                    'text_en': r['correct_text_en'],
+                    'label': correct_label,
+                    'text_en': correct_word,
                     'text_tr': r['correct_text_tr']
                 },
                 'explanation_tr': r['explanation_tr'],
@@ -401,6 +486,7 @@ def get_tests():
                 'is_correct': r['is_correct'],
                 'hinted': r['hinted']
             })
+        conn.close()
         return jsonify(result)
     except Exception as e:
         conn.close()

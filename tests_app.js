@@ -491,10 +491,13 @@ function openExplanationModal(isCorrect, question, selectedOpt) {
     modalExplanationTextEl.textContent = question.explanation_tr || "Bu sorunun çözümü için detaylı açıklama bulunmuyor.";
   }
   
-  // Populate distractor reasons (why not others)
-  if (question.why_not_others_tr && Array.isArray(question.why_not_others_tr) && question.why_not_others_tr.length > 0) {
+  // Populate options meanings section in modal
+  if (question.options && Array.isArray(question.options) && question.options.length > 0) {
     modalDistractorsSectionEl.classList.remove('hidden');
-    question.why_not_others_tr.forEach(item => {
+    const titleEl = modalDistractorsSectionEl.querySelector('.explain-label');
+    if (titleEl) titleEl.textContent = "Seçeneklerin Türkçe Anlamları";
+    
+    question.options.forEach(opt => {
       const itemEl = document.createElement('div');
       itemEl.className = 'distractor-note-item';
       itemEl.style.display = 'flex';
@@ -502,17 +505,18 @@ function openExplanationModal(isCorrect, question, selectedOpt) {
       itemEl.style.gap = '8px';
       itemEl.style.marginTop = '8px';
       
+      let labelStyle = "font-weight: 700; color: var(--color-text-primary); background-color: var(--color-bg-alt); padding: 1px 6px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #cbd5e1;";
+      if (opt.label === question.answer.label) {
+        labelStyle = "font-weight: 700; color: #ffffff; background-color: var(--color-success); padding: 1px 6px; border-radius: 4px; font-size: 0.8rem; border: 1px solid var(--color-success);";
+      } else if (opt.label === selectedOpt.label && !isCorrect) {
+        labelStyle = "font-weight: 700; color: #ffffff; background-color: var(--color-danger); padding: 1px 6px; border-radius: 4px; font-size: 0.8rem; border: 1px solid var(--color-danger);";
+      }
+      
       itemEl.innerHTML = `
-        <span style="
-          font-weight: 700;
-          color: var(--color-text-primary);
-          background-color: var(--color-bg-alt);
-          padding: 1px 6px;
-          border-radius: 4px;
-          font-size: 0.8rem;
-          border: 1px solid #cbd5e1;
-        ">${item.label}</span>
-        <span style="font-size: 0.9rem; color: var(--color-text-secondary); line-height: 1.5;">${item.note_tr}</span>
+        <span style="${labelStyle}">${opt.label}</span>
+        <span style="font-size: 0.95rem; color: var(--color-text-primary); line-height: 1.5;">
+          <strong>${opt.text_en}</strong>: <span style="color: var(--color-text-secondary); font-style: italic;">${opt.text_tr}</span>
+        </span>
       `;
       modalDistractorsListEl.appendChild(itemEl);
     });
