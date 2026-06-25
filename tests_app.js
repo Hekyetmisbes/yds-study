@@ -49,6 +49,8 @@ const modalExplanationTextEl = document.getElementById('modal-explanation-text')
 const modalDistractorsSectionEl = document.getElementById('modal-distractors-section');
 const modalDistractorsListEl = document.getElementById('modal-distractors-list');
 const modalCloseBtnEl = document.getElementById('modal-close-btn');
+const modalSentenceEnEl = document.getElementById('modal-sentence-en');
+const modalSentenceTrEl = document.getElementById('modal-sentence-tr');
 
 // Initialization
 window.addEventListener('DOMContentLoaded', () => {
@@ -473,6 +475,16 @@ function openExplanationModal(isCorrect, question, selectedOpt) {
   if (modalCorrectLabelEl) modalCorrectLabelEl.textContent = question.answer.label;
   if (modalCorrectTextEnEl) modalCorrectTextEnEl.textContent = question.answer.text_en;
   if (modalCorrectTextTrEl) modalCorrectTextTrEl.textContent = question.answer.text_tr;
+  
+  // Populate sentence and translation section
+  if (modalSentenceEnEl) {
+    const fullEn = question.question_en ? question.question_en.replace(/____/g, `[ ${question.answer.text_en} ]`) : "";
+    modalSentenceEnEl.textContent = fullEn;
+  }
+  if (modalSentenceTrEl) {
+    const fullTr = question.question_tr ? question.question_tr.replace(/____/g, `[ ${question.answer.text_tr} ]`) : "";
+    modalSentenceTrEl.textContent = fullTr;
+  }
   
   // Set explanation text
   if (modalExplanationTextEl) {
